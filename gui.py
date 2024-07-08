@@ -93,6 +93,7 @@ class FlashcardGUI:
         tk.Label(self.main_frame, text="Welcome to Flashcard App!", font=("Arial", 20), bg="lightblue").pack(pady=20)
         tk.Button(self.main_frame, text="View Existing Sets", command=self.show_existing_sets).pack(pady=10)
         tk.Button(self.main_frame, text="Create New Set", command=self.create_new_set).pack(pady=10)
+        tk.Button(self.main_frame, text="Exit", command=self.on_closing).pack(pady=10)
 
     def show_existing_sets(self):
         """ Show the existing flashcard sets."""
@@ -106,8 +107,8 @@ class FlashcardGUI:
             tk.Label(self.main_frame, text="Available Flashcard Sets:", font=("Arial", 16), bg="lightblue").pack(
                 pady=20)
             for i, flashcard_set in enumerate(self.flashcard_sets):
-                tk.Button(self.main_frame, text=flashcard_set.title, command=lambda x=i: self.show_set_options(x)).pack(
-                    pady=5)
+                tk.Button(self.main_frame, text=f"{i + 1}. {flashcard_set.title}",
+                          command=lambda x=i: self.show_set_options(x)).pack(pady=5)
 
         tk.Button(self.main_frame, text="Back", command=self.show_welcome_screen).pack(pady=20)
 
@@ -191,14 +192,18 @@ class FlashcardGUI:
         for widget in self.main_frame.winfo_children():
             widget.destroy()
 
-        tk.Label(self.main_frame, text=f"Editing Set: {self.current_set.title}", font=("Arial", 16),
-                 bg="lightblue").pack(pady=20)
+        tk.Label(self.main_frame, text=f"Editing Set: {self.current_set.title}", font=("Arial", 16), bg="lightblue").pack(pady=20)
         tk.Button(self.main_frame, text="Edit Title", command=self.edit_set_title).pack(pady=10)
         tk.Button(self.main_frame, text="Add Card", command=self.add_card_to_current_set).pack(pady=10)
-        tk.Button(self.main_frame, text="Edit Cards", command=self.edit_cards).pack(pady=10)
+        tk.Button(self.main_frame, text="Edit Cards", command=self.edit_card).pack(pady=10)
         tk.Button(self.main_frame, text="Delete Card", command=self.delete_card).pack(pady=10)
-        tk.Button(self.main_frame, text="Back",
-                  command=lambda: self.show_set_options(self.flashcard_sets.index(self.current_set))).pack(pady=20)
+        tk.Button(self.main_frame, text="Back", command=lambda: self.show_set_options(self.flashcard_sets.index(self.current_set))).pack(pady=20)
+
+        # Display current cards with indexes
+        if self.current_set.cards:
+            tk.Label(self.main_frame, text="Current Cards:", font=("Arial", 14), bg="lightblue").pack(pady=10)
+            for i, card in enumerate(self.current_set.cards):
+                tk.Label(self.main_frame, text=f"{i+1}. Q: {card.front[:30]}... A: {card.back[:30]}...", bg="lightblue").pack(pady=2)
 
     def edit_set_title(self):
         """ Edit the title of the current flashcard set."""
@@ -216,14 +221,19 @@ class FlashcardGUI:
                 self.current_set.add_card(front, back)
         self.edit_current_set()
 
-    def edit_cards(self):
-        """ Edit the cards in the current set."""
+    def edit_card(self):
+        """ Edit the cards in the current flashcard set."""
         if not self.current_set.cards:
             messagebox.showinfo("Empty Set", "This set has no cards to edit.")
             return
 
-        card_index = simpledialog.askinteger("Edit Card", "Enter the card number to edit:", minvalue=1,
-                                             maxvalue=len(self.current_set.cards))
+        # Display cards with indexes
+        card_list = "\n".join([f"{i + 1}. Q: {card.front[:30]}... A: {card.back[:30]}..." for i, card in
+                               enumerate(self.current_set.cards)])
+        card_index = simpledialog.askinteger("Edit Card",
+                                             f"Current cards:\n{card_list}\n\nEnter the card number to edit:",
+                                             minvalue=1, maxvalue=len(self.current_set.cards))
+
         if card_index:
             card = self.current_set.cards[card_index - 1]
             new_front = simpledialog.askstring("Edit Card", "Enter the new question:", initialvalue=card.front)
@@ -233,15 +243,20 @@ class FlashcardGUI:
         self.edit_current_set()
 
     def delete_card(self):
-        """ Delete a card from the current set."""
+        """ Delete a card from the current flashcard set."""
         if not self.current_set.cards:
             messagebox.showinfo("Empty Set", "This set has no cards to delete.")
             return
 
-        card_index = simpledialog.askinteger("Delete Card", "Enter the card number to delete:", minvalue=1,
-                                             maxvalue=len(self.current_set.cards))
+        # Display cards with indexes
+        card_list = "\n".join([f"{i + 1}. Q: {card.front[:30]}... A: {card.back[:30]}..." for i, card in
+                               enumerate(self.current_set.cards)])
+        card_index = simpledialog.askinteger("Delete Card",
+                                             f"Current cards:\n{card_list}\n\nEnter the card number to delete:",
+                                             minvalue=1, maxvalue=len(self.current_set.cards))
+
         if card_index:
-            if messagebox.askyesno("Confirm Deletion", "Are you sure you want to delete this card?"):
+            if messagebox.askyesno("Confirm Deletion", f"Are you sure you want to delete card {card_index}?"):
                 self.current_set.delete_card(card_index - 1)
         self.edit_current_set()
 
