@@ -125,8 +125,7 @@ class FlashcardGUI:
                       fg_color="#3498db", hover_color="#2980b9", width=80).pack(side=tk.LEFT, padx=(0, 10))
         ctk.CTkButton(button_frame, text="Edit", command=lambda: self.edit_set(index),
                       fg_color="#f39c12", hover_color="#d35400", width=80).pack(side=tk.LEFT)
-        ctk.CTkButton(button_frame, text="Exit", command=self.on_closing,
-                      fg_color="#e74c3c", hover_color="#e34500", width=80).pack(side=tk.LEFT)
+
 
     def create_new_set(self):
         title = simpledialog.askstring("New Deck", "Enter the title of the new deck:")
