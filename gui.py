@@ -1,10 +1,12 @@
 import tkinter as tk
-from tkinter import messagebox, simpledialog
+from tkinter import messagebox, simpledialog, ttk
+import customtkinter as ctk
 import random
 
 
 class FlashCard:
     """ Class to represent a flashcard."""
+
     def __init__(self, front, back):
         self.front = front
         self.back = back
@@ -12,6 +14,7 @@ class FlashCard:
 
 class FlashCardSet:
     """ Class to represent a set of flashcards."""
+
     def __init__(self, title):
         self.title = title
         self.cards = []
@@ -46,13 +49,15 @@ class FlashCardSet:
 
 
 class FlashcardGUI:
-    """ Class to represent the Flashcard App GUI"""
     def __init__(self, root):
-        self.main_frame = None
         self.root = root
         self.root.title("Flashcard App")
-        self.root.geometry("800x600")
-        self.root.configure(bg="lightblue")
+        self.root.geometry("400x600")
+        self.root.minsize(400, 600)
+
+        # Set the theme
+        ctk.set_appearance_mode("light")
+        ctk.set_default_color_theme("blue")
 
         self.flashcard_sets = []
         self.current_set = None
@@ -61,60 +66,69 @@ class FlashcardGUI:
         self.init_ui()
 
     def init_ui(self):
-        """ Initialize the GUI components."""
-        self.create_menu()
         self.create_main_frame()
-        self.show_welcome_screen()
-
-    def create_menu(self):
-        """ Create the menu bar."""
-        menubar = tk.Menu(self.root)
-        self.root.config(menu=menubar)
-
-        file_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="New Set", command=self.create_new_set)
-        file_menu.add_command(label="Exit", command=self.root.quit)
-
-        edit_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="Edit", menu=edit_menu)
-        edit_menu.add_command(label="Edit Current Set", command=self.edit_current_set)
+        self.show_deck_manager()
 
     def create_main_frame(self):
-        """ Create the main frame."""
-        self.main_frame = tk.Frame(self.root, bg="lightblue")
+        self.main_frame = ctk.CTkFrame(self.root, fg_color="#F0F0F0")
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-    def show_welcome_screen(self):
-        """ Show the welcome screen."""
+    def show_deck_manager(self):
         for widget in self.main_frame.winfo_children():
             widget.destroy()
 
-        tk.Label(self.main_frame, text="Welcome to Flashcard App!", font=("Arial", 20), bg="lightblue").pack(pady=20)
-        tk.Button(self.main_frame, text="View Existing Sets", command=self.show_existing_sets).pack(pady=10)
-        tk.Button(self.main_frame, text="Create New Set", command=self.create_new_set).pack(pady=10)
-        tk.Button(self.main_frame, text="Exit", command=self.on_closing).pack(pady=10)
+        # Header
+        header_frame = ctk.CTkFrame(self.main_frame, fg_color="#3498db", corner_radius=0)
+        header_frame.pack(fill=tk.X, pady=(0, 20))
+        ctk.CTkLabel(header_frame, text="Your Decks", font=("Roboto", 24, "bold"), text_color="white").pack(pady=20)
 
-    def show_existing_sets(self):
-        """ Show the existing flashcard sets."""
-        for widget in self.main_frame.winfo_children():
-            widget.destroy()
+        # Scrollable frame for decks
+        scroll_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="#F0F0F0")
+        scroll_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
 
-        if not self.flashcard_sets:
-            tk.Label(self.main_frame, text="No flashcard sets found. Create a new set to start learning.",
-                     bg="lightblue").pack(pady=20)
-        else:
-            tk.Label(self.main_frame, text="Available Flashcard Sets:", font=("Arial", 16), bg="lightblue").pack(
-                pady=20)
-            for i, flashcard_set in enumerate(self.flashcard_sets):
-                tk.Button(self.main_frame, text=f"{i + 1}. {flashcard_set.title}",
-                          command=lambda x=i: self.show_set_options(x)).pack(pady=5)
+        # Add deck cards
+        for i, deck in enumerate(self.flashcard_sets):
+            self.create_deck_card(scroll_frame, deck, i)
 
-        tk.Button(self.main_frame, text="Back", command=self.show_welcome_screen).pack(pady=20)
+        # Add new deck button
+        new_deck_button = ctk.CTkButton(self.main_frame, text="+ Create New Deck",
+                                        command=self.create_new_set,
+                                        fg_color="#2ecc71", hover_color="#27ae60",
+                                        height=50, corner_radius=10)
+        new_deck_button.pack(padx=20, pady=(0, 20), fill=tk.X)
+
+        # Add Exit button
+        exit_button = ctk.CTkButton(self.main_frame, text="Exit", command=self.on_closing,
+                                    fg_color="#e74c3c", hover_color="#c0392b",
+                                    height=50, corner_radius=10)
+        exit_button.pack(padx=20, pady=(0, 20), fill=tk.X)
+
+        # Add Help button
+        help_button = ctk.CTkButton(self.main_frame, text="Help", command=self.show_help_screen,
+                                    fg_color="#3498db", hover_color="#2980b9",
+                                    height=50, corner_radius=10)
+        help_button.pack(padx=20, pady=(0, 20), fill=tk.X)
+
+
+    def create_deck_card(self, parent, deck, index):
+        card_frame = ctk.CTkFrame(parent, fg_color="white", corner_radius=10)
+        card_frame.pack(fill=tk.X, pady=5)
+
+        ctk.CTkLabel(card_frame, text=deck.title, font=("Roboto", 18, "bold")).pack(anchor="w", padx=15, pady=(10, 5))
+        ctk.CTkLabel(card_frame, text=f"{len(deck.cards)} cards", font=("Roboto", 14)).pack(anchor="w", padx=15,
+                                                                                            pady=(0, 10))
+
+        button_frame = ctk.CTkFrame(card_frame, fg_color="transparent")
+        button_frame.pack(fill=tk.X, padx=15, pady=(0, 10))
+
+        ctk.CTkButton(button_frame, text="Study", command=lambda: self.start_learning(index),
+                      fg_color="#3498db", hover_color="#2980b9", width=80).pack(side=tk.LEFT, padx=(0, 10))
+        ctk.CTkButton(button_frame, text="Edit", command=lambda: self.edit_set(index),
+                      fg_color="#f39c12", hover_color="#d35400", width=80).pack(side=tk.LEFT)
+
 
     def create_new_set(self):
-        """ Create a new flashcard set."""
-        title = simpledialog.askstring("New Set", "Enter the title of the new set:")
+        title = simpledialog.askstring("New Deck", "Enter the title of the new deck:")
         if title:
             new_set = FlashCardSet(title)
             self.flashcard_sets.append(new_set)
@@ -122,7 +136,6 @@ class FlashcardGUI:
             self.add_cards_to_set()
 
     def add_cards_to_set(self):
-        """ Add cards to the current set."""
         while True:
             front = simpledialog.askstring("New Card", "Enter the question:")
             if not front:
@@ -133,25 +146,12 @@ class FlashcardGUI:
             self.current_set.add_card(front, back)
             if not messagebox.askyesno("Add Another", "Do you want to add another card?"):
                 break
-        self.show_existing_sets()
+        self.show_deck_manager()
 
-    def show_set_options(self, set_index):
-        """ Show the options for the selected flashcard set."""
+    def start_learning(self, set_index):
         self.current_set = self.flashcard_sets[set_index]
-        for widget in self.main_frame.winfo_children():
-            widget.destroy()
-
-        tk.Label(self.main_frame, text=f"Set: {self.current_set.title}", font=("Arial", 16), bg="lightblue").pack(
-            pady=20)
-        tk.Button(self.main_frame, text="Start Learning", command=self.start_learning).pack(pady=10)
-        tk.Button(self.main_frame, text="Edit Set", command=self.edit_current_set).pack(pady=10)
-        tk.Button(self.main_frame, text="Delete Set", command=lambda: self.delete_set(set_index)).pack(pady=10)
-        tk.Button(self.main_frame, text="Back", command=self.show_existing_sets).pack(pady=20)
-
-    def start_learning(self):
-        """ Start the flashcard learning session"""
         if not self.current_set.cards:
-            messagebox.showinfo("Empty Set", "This set has no cards. Add some cards first.")
+            messagebox.showinfo("Empty Deck", "This deck has no cards. Add some cards first.")
             return
 
         self.current_card_index = 0
@@ -159,118 +159,151 @@ class FlashcardGUI:
         self.show_flashcard()
 
     def show_flashcard(self):
-        """ Show the flashcard on the screen."""
         for widget in self.main_frame.winfo_children():
             widget.destroy()
 
         card = self.current_set.cards[self.current_card_index]
-        tk.Label(self.main_frame, text=card.front, font=("Arial", 20), bg="lightblue").pack(pady=50)
-        tk.Button(self.main_frame, text="Show Answer", command=self.show_answer).pack(pady=20)
-        tk.Button(self.main_frame, text="Next Card", command=self.next_card).pack(pady=20)
-        tk.Button(self.main_frame, text="End Session", command=self.on_closing).pack(pady=20)
 
-    def show_answer(self):
-        """ Show the answer of the flashcard."""
+        # Header
+        header_frame = ctk.CTkFrame(self.main_frame, fg_color="#3498db", corner_radius=0)
+        header_frame.pack(fill=tk.X, pady=(0, 20))
+        ctk.CTkLabel(header_frame, text=self.current_set.title, font=("Roboto", 24, "bold"), text_color="white").pack(
+            pady=20)
+
+        # Card frame
+        card_frame = ctk.CTkFrame(self.main_frame, fg_color="white", corner_radius=10)
+        card_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+
+        question_label = ctk.CTkLabel(card_frame, text=card.front, font=("Roboto", 18), wraplength=300)
+        question_label.pack(pady=(40, 20), padx=20)
+
+        show_answer_btn = ctk.CTkButton(card_frame, text="Show Answer", command=lambda: self.show_answer(answer_label),
+                                        fg_color="#3498db", hover_color="#2980b9")
+        show_answer_btn.pack(pady=10)
+
+        answer_label = ctk.CTkLabel(card_frame, text="", font=("Roboto", 16), wraplength=300)
+        answer_label.pack(pady=20, padx=20)
+
+        # Navigation buttons
+        nav_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        nav_frame.pack(fill=tk.X, padx=20, pady=20)
+
+        ctk.CTkButton(nav_frame, text="Previous", command=self.prev_card,
+                      fg_color="#95a5a6", hover_color="#7f8c8d", width=100).pack(side=tk.LEFT)
+        ctk.CTkButton(nav_frame, text="Next", command=self.next_card,
+                      fg_color="#2ecc71", hover_color="#27ae60", width=100).pack(side=tk.RIGHT)
+        ctk.CTkButton(self.main_frame, text="End Session", command=self.show_deck_manager,
+                      fg_color="#e74c3c", hover_color="#c0392b").pack(pady=10)
+
+    def show_answer(self, answer_label):
         card = self.current_set.cards[self.current_card_index]
-        messagebox.showinfo("Answer", card.back)
+        answer_label.configure(text=card.back)
+
+    def prev_card(self):
+        self.current_card_index = (self.current_card_index - 1) % len(self.current_set.cards)
+        self.show_flashcard()
 
     def next_card(self):
-        """ Show the next flashcard."""
-        self.current_card_index += 1
-        if self.current_card_index >= len(self.current_set.cards):
-            messagebox.showinfo("Completed", "You've gone through all the cards!")
-            self.show_set_options(self.flashcard_sets.index(self.current_set))
-        else:
-            self.show_flashcard()
+        self.current_card_index = (self.current_card_index + 1) % len(self.current_set.cards)
+        self.show_flashcard()
 
-    def edit_current_set(self):
-        """ Edit the current flashcard set."""
-        if not self.current_set:
-            messagebox.showinfo("No Set Selected", "Please select a set first.")
-            return
+    def edit_set(self, set_index):
+        self.current_set = self.flashcard_sets[set_index]
+        self.show_edit_screen()
 
+    def show_edit_screen(self):
         for widget in self.main_frame.winfo_children():
             widget.destroy()
 
-        tk.Label(self.main_frame, text=f"Editing Set: {self.current_set.title}", font=("Arial", 16), bg="lightblue").pack(pady=20)
-        tk.Button(self.main_frame, text="Edit Title", command=self.edit_set_title).pack(pady=10)
-        tk.Button(self.main_frame, text="Add Card", command=self.add_card_to_current_set).pack(pady=10)
-        tk.Button(self.main_frame, text="Edit Cards", command=self.edit_card).pack(pady=10)
-        tk.Button(self.main_frame, text="Delete Card", command=self.delete_card).pack(pady=10)
-        tk.Button(self.main_frame, text="Back", command=lambda: self.show_set_options(self.flashcard_sets.index(self.current_set))).pack(pady=20)
+        # Header
+        header_frame = ctk.CTkFrame(self.main_frame, fg_color="#3498db", corner_radius=0)
+        header_frame.pack(fill=tk.X, pady=(0, 20))
+        ctk.CTkLabel(header_frame, text=f"Editing: {self.current_set.title}", font=("Roboto", 24, "bold"),
+                     text_color="white").pack(pady=20)
 
-        # Display current cards with indexes
-        if self.current_set.cards:
-            tk.Label(self.main_frame, text="Current Cards:", font=("Arial", 14), bg="lightblue").pack(pady=10)
-            for i, card in enumerate(self.current_set.cards):
-                tk.Label(self.main_frame, text=f"{i+1}. Q: {card.front[:30]}... A: {card.back[:30]}...", bg="lightblue").pack(pady=2)
+        # Scrollable frame for cards
+        scroll_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="#F0F0F0")
+        scroll_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
 
-    def edit_set_title(self):
-        """ Edit the title of the current flashcard set."""
-        new_title = simpledialog.askstring("Edit Title", "Enter the new title:", initialvalue=self.current_set.title)
-        if new_title:
-            self.current_set.title = new_title
-            self.edit_current_set()
+        for i, card in enumerate(self.current_set.cards):
+            card_frame = ctk.CTkFrame(scroll_frame, fg_color="white", corner_radius=10)
+            card_frame.pack(fill=tk.X, pady=5)
+
+            ctk.CTkLabel(card_frame, text=f"Q: {card.front[:30]}...", font=("Roboto", 14, "bold")).pack(anchor="w",
+                                                                                                        padx=15,
+                                                                                                        pady=(10, 5))
+            ctk.CTkLabel(card_frame, text=f"A: {card.back[:30]}...", font=("Roboto", 12)).pack(anchor="w", padx=15,
+                                                                                               pady=(0, 10))
+
+            button_frame = ctk.CTkFrame(card_frame, fg_color="transparent")
+            button_frame.pack(fill=tk.X, padx=15, pady=(0, 10))
+
+            ctk.CTkButton(button_frame, text="Edit", command=lambda x=i: self.edit_card(x),
+                          fg_color="#f39c12", hover_color="#d35400", width=60).pack(side=tk.LEFT, padx=(0, 10))
+            ctk.CTkButton(button_frame, text="Delete", command=lambda x=i: self.delete_card(x),
+                          fg_color="#e74c3c", hover_color="#c0392b", width=60).pack(side=tk.LEFT)
+
+        # Add new card button
+        new_card_button = ctk.CTkButton(self.main_frame, text="+ Add New Card",
+                                        command=self.add_card_to_current_set,
+                                        fg_color="#2ecc71", hover_color="#27ae60",
+                                        height=50, corner_radius=10)
+        new_card_button.pack(padx=20, pady=(0, 10), fill=tk.X)
+
+        # Back button
+        back_button = ctk.CTkButton(self.main_frame, text="Back to Decks",
+                                    command=self.show_deck_manager,
+                                    fg_color="#95a5a6", hover_color="#7f8c8d",
+                                    height=50, corner_radius=10)
+        back_button.pack(padx=20, pady=(0, 20), fill=tk.X)
+
+    def edit_card(self, card_index):
+        card = self.current_set.cards[card_index]
+        new_front = simpledialog.askstring("Edit Card", "Enter the new question:", initialvalue=card.front)
+        new_back = simpledialog.askstring("Edit Card", "Enter the new answer:", initialvalue=card.back)
+        if new_front and new_back:
+            self.current_set.edit_card(card_index, new_front, new_back)
+        self.show_edit_screen()
+
+    def delete_card(self, card_index):
+        if messagebox.askyesno("Confirm Deletion", f"Are you sure you want to delete this card?"):
+            self.current_set.delete_card(card_index)
+        self.show_edit_screen()
 
     def add_card_to_current_set(self):
-        """ Add a card to the current flashcard set."""
         front = simpledialog.askstring("New Card", "Enter the question:")
         if front:
             back = simpledialog.askstring("New Card", "Enter the answer:")
             if back:
                 self.current_set.add_card(front, back)
-        self.edit_current_set()
-
-    def edit_card(self):
-        """ Edit the cards in the current flashcard set."""
-        if not self.current_set.cards:
-            messagebox.showinfo("Empty Set", "This set has no cards to edit.")
-            return
-
-        # Display cards with indexes
-        card_list = "\n".join([f"{i + 1}. Q: {card.front[:30]}... A: {card.back[:30]}..." for i, card in
-                               enumerate(self.current_set.cards)])
-        card_index = simpledialog.askinteger("Edit Card",
-                                             f"Current cards:\n{card_list}\n\nEnter the card number to edit:",
-                                             minvalue=1, maxvalue=len(self.current_set.cards))
-
-        if card_index:
-            card = self.current_set.cards[card_index - 1]
-            new_front = simpledialog.askstring("Edit Card", "Enter the new question:", initialvalue=card.front)
-            new_back = simpledialog.askstring("Edit Card", "Enter the new answer:", initialvalue=card.back)
-            if new_front and new_back:
-                self.current_set.edit_card(card_index - 1, new_front, new_back)
-        self.edit_current_set()
-
-    def delete_card(self):
-        """ Delete a card from the current flashcard set."""
-        if not self.current_set.cards:
-            messagebox.showinfo("Empty Set", "This set has no cards to delete.")
-            return
-
-        # Display cards with indexes
-        card_list = "\n".join([f"{i + 1}. Q: {card.front[:30]}... A: {card.back[:30]}..." for i, card in
-                               enumerate(self.current_set.cards)])
-        card_index = simpledialog.askinteger("Delete Card",
-                                             f"Current cards:\n{card_list}\n\nEnter the card number to delete:",
-                                             minvalue=1, maxvalue=len(self.current_set.cards))
-
-        if card_index:
-            if messagebox.askyesno("Confirm Deletion", f"Are you sure you want to delete card {card_index}?"):
-                self.current_set.delete_card(card_index - 1)
-        self.edit_current_set()
-
-    def delete_set(self, set_index):
-        """ Delete the selected flashcard set."""
-        if messagebox.askyesno("Confirm Deletion",
-                               f"Are you sure you want to delete the set '{self.flashcard_sets[set_index].title}'?"):
-            del self.flashcard_sets[set_index]
-            self.show_existing_sets()
+        self.show_edit_screen()
 
     def on_closing(self):
         """ Handle the window closing event."""
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.root.destroy()
+
+    def show_help_screen(self):
+        """Explain how app works"""
+        for widget in self.main_frame.winfo_children():
+            widget.destroy()
+
+        # Header
+        header_frame = ctk.CTkFrame(self.main_frame, fg_color="#3498db", corner_radius=0)
+        header_frame.pack(fill=tk.X, pady=(0, 20))
+        ctk.CTkLabel(header_frame, text="Help", font=("Roboto", 24, "bold"), text_color="white").pack(pady=20)
+
+        # Help text
+        help_text = "help text"
+        ctk.CTkLabel(self.main_frame, text=help_text, font=("Roboto", 14)).pack(pady=20)
+
+        # Back button
+        back_button = ctk.CTkButton(self.main_frame, text="Back to Decks",
+                                    command=self.show_deck_manager,
+                                    fg_color="#95a5a6", hover_color="#7f8c8d",
+                                    height=50, corner_radius=10)
+        back_button.pack(padx=20, pady=(0, 20), fill=tk.X)
+
 
 
 
@@ -278,4 +311,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = FlashcardGUI(root)
     root.mainloop()
-
