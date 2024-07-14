@@ -3,7 +3,6 @@ from tkinter import messagebox, simpledialog, ttk
 import customtkinter as ctk
 import random
 
-
 class FlashCard:
     """ Class to represent a flashcard."""
 
@@ -46,7 +45,6 @@ class FlashCardSet:
         :return: None
         """
         self.cards.pop(index)
-
 
 class FlashcardGUI:
     def __init__(self, root):
@@ -293,10 +291,16 @@ class FlashcardGUI:
         header_frame.pack(fill=tk.X, pady=(0, 20))
         ctk.CTkLabel(header_frame, text="Help", font=("Roboto", 24, "bold"), text_color="white").pack(pady=20)
 
-        # Help text
-        help_text = "help text"
-        ctk.CTkLabel(self.main_frame, text=help_text, font=("Roboto", 14)).pack(pady=20)
+        # Scrollable frame for help
+        scroll_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="#F0F0F0")
+        scroll_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
 
+        # Help text
+        # help_text = ""help text"""
+        help_text = self.load_help_text()
+
+        ctk.CTkLabel(scroll_frame, text=help_text, justify= "left", font=("Roboto", 14), wraplength=300).pack(pady=20, padx=20, anchor='w')
+        
         # Back button
         back_button = ctk.CTkButton(self.main_frame, text="Back to Decks",
                                     command=self.show_deck_manager,
@@ -304,9 +308,13 @@ class FlashcardGUI:
                                     height=50, corner_radius=10)
         back_button.pack(padx=20, pady=(0, 20), fill=tk.X)
 
-
-
-
+    def load_help_text(self):
+        try:
+            with open("help_text.txt", "r") as file:
+                return file.read()
+        except FileNotFoundError:
+            return "Help text file not found. Please ensure 'help_text.txt' is in the same directory as the application."
+    
 if __name__ == "__main__":
     root = tk.Tk()
     app = FlashcardGUI(root)

@@ -1,0 +1,35 @@
+# Welcome to the Flashcard App!
+
+This is a little help on how use this application:
+
+1. **Create a New Deck**:
+    - Click on the "+ Create New Deck" button.
+    - Enter a title for your new deck.
+    - Add flashcards by entering questions and answers.
+    - Questions can be simple vocabularies or simple math problems with definite answers. Examples: chair or 3 x 6
+
+2. **View Your Decks**:
+    - Your created decks will be listed on the main screen.
+    - Each deck shows the number of cards it contains.
+
+3. **Study a Deck**:
+    - Click the "Study" button on the deck you want to study.
+    - You will see the question side of a flashcard.
+    - Click "Show Answer" to reveal the answer.
+    - Use "Next" and "Previous" buttons to navigate through the cards.
+
+4. **Edit a Deck**:
+    - Click the "Edit" button on the deck you want to modify.
+    - You can add, edit, or delete flashcards within the deck.
+
+5. **Delete a Deck**:
+    - While in edit mode, you can delete individual cards.
+    - Confirm deletion when prompted.
+
+6. **Help**:
+    - Click the "Help" button to view these instructions.
+
+7. **Exit the App**:
+    - Click the "Exit" button to close the application.
+
+We hope this helps you get started with your flashcard studies. Happy learning!
