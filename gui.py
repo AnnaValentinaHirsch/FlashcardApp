@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog, ttk
 import customtkinter as ctk
 import random
-
+from help_screen import HelpScreen  # Import the HelpScreen class
 
 class FlashCard:
     """ Class to represent a flashcard."""
@@ -46,7 +46,6 @@ class FlashCardSet:
         :return: None
         """
         self.cards.pop(index)
-
 
 class FlashcardGUI:
     def __init__(self, root):
@@ -284,19 +283,11 @@ class FlashcardGUI:
             self.root.destroy()
 
     def show_help_screen(self):
-        """Explain how app works"""
-        for widget in self.main_frame.winfo_children():
-            widget.destroy()
+        """ Show the help screen """
+        help_screen = HelpScreen(self.main_frame)
+        help_screen.show()
 
-        # Header
-        header_frame = ctk.CTkFrame(self.main_frame, fg_color="#3498db", corner_radius=0)
-        header_frame.pack(fill=tk.X, pady=(0, 20))
-        ctk.CTkLabel(header_frame, text="Help", font=("Roboto", 24, "bold"), text_color="white").pack(pady=20)
-
-        # Help text
-        help_text = "help text"
-        ctk.CTkLabel(self.main_frame, text=help_text, font=("Roboto", 14)).pack(pady=20)
-
+        
         # Back button
         back_button = ctk.CTkButton(self.main_frame, text="Back to Decks",
                                     command=self.show_deck_manager,
@@ -304,9 +295,7 @@ class FlashcardGUI:
                                     height=50, corner_radius=10)
         back_button.pack(padx=20, pady=(0, 20), fill=tk.X)
 
-
-
-
+    
 if __name__ == "__main__":
     root = tk.Tk()
     app = FlashcardGUI(root)
