@@ -56,7 +56,7 @@ class FlashcardGUI:
         self.root.minsize(400, 600)
 
         # Set the theme
-        ctk.set_appearance_mode("light")
+        ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
 
         self.flashcard_sets = []
@@ -109,7 +109,6 @@ class FlashcardGUI:
                                     height=50, corner_radius=10)
         help_button.pack(padx=20, pady=(0, 20), fill=tk.X)
 
-
     def create_deck_card(self, parent, deck, index):
         card_frame = ctk.CTkFrame(parent, fg_color="white", corner_radius=10)
         card_frame.pack(fill=tk.X, pady=5)
@@ -126,7 +125,6 @@ class FlashcardGUI:
         ctk.CTkButton(button_frame, text="Edit", command=lambda: self.edit_set(index),
                       fg_color="#f39c12", hover_color="#d35400", width=80).pack(side=tk.LEFT)
 
-
     def create_new_set(self):
         title = simpledialog.askstring("New Deck", "Enter the title of the new deck:")
         if title:
@@ -137,14 +135,30 @@ class FlashcardGUI:
 
     def add_cards_to_set(self):
         while True:
-            front = simpledialog.askstring("New Card", "Enter the question:")
-            if not front:
-                break
-            back = simpledialog.askstring("New Card", "Enter the answer:")
-            if not back:
-                break
-            self.current_set.add_card(front, back)
-            if not messagebox.askyesno("Add Another", "Do you want to add another card?"):
+            input_frame = ctk.CTkFrame(self.main_frame, fg_color="white", corner_radius=10)
+            input_frame.pack(fill=tk.X, padx=20, pady=20)
+            
+            ctk.CTkLabel(input_frame, text="Question:", font=("Roboto", 14)).pack(anchor="w", padx=15, pady=(10, 5))
+            front_entry = ctk.CTkEntry(input_frame)
+            front_entry.pack(fill=tk.X, padx=15, pady=(0, 10))
+            
+            ctk.CTkLabel(input_frame, text="Answer:", font=("Roboto", 14)).pack(anchor="w", padx=15, pady=(10, 5))
+            back_entry = ctk.CTkEntry(input_frame)
+            back_entry.pack(fill=tk.X, padx=15, pady=(0, 10))
+            
+            def save_card():
+                front = front_entry.get()
+                back = back_entry.get()
+                if front and back:
+                    self.current_set.add_card(front, back)
+                input_frame.pack_forget()
+            
+            save_button = ctk.CTkButton(input_frame, text="Save Card", command=save_card,
+                                        fg_color="#2ecc71", hover_color="#27ae60", height=40, corner_radius=10)
+            save_button.pack(pady=(10, 20))
+            
+            add_another = messagebox.askyesno("Add Another", "Do you want to add another card?")
+            if not add_another:
                 break
         self.show_deck_manager()
 
@@ -259,11 +273,30 @@ class FlashcardGUI:
 
     def edit_card(self, card_index):
         card = self.current_set.cards[card_index]
-        new_front = simpledialog.askstring("Edit Card", "Enter the new question:", initialvalue=card.front)
-        new_back = simpledialog.askstring("Edit Card", "Enter the new answer:", initialvalue=card.back)
-        if new_front and new_back:
-            self.current_set.edit_card(card_index, new_front, new_back)
-        self.show_edit_screen()
+        input_frame = ctk.CTkFrame(self.main_frame, fg_color="white", corner_radius=10)
+        input_frame.pack(fill=tk.X, padx=20, pady=20)
+        
+        ctk.CTkLabel(input_frame, text="Question:", font=("Roboto", 14)).pack(anchor="w", padx=15, pady=(10, 5))
+        front_entry = ctk.CTkEntry(input_frame)
+        front_entry.insert(0, card.front)
+        front_entry.pack(fill=tk.X, padx=15, pady=(0, 10))
+        
+        ctk.CTkLabel(input_frame, text="Answer:", font=("Roboto", 14)).pack(anchor="w", padx=15, pady=(10, 5))
+        back_entry = ctk.CTkEntry(input_frame)
+        back_entry.insert(0, card.back)
+        back_entry.pack(fill=tk.X, padx=15, pady=(0, 10))
+        
+        def save_card():
+            new_front = front_entry.get()
+            new_back = back_entry.get()
+            if new_front and new_back:
+                self.current_set.edit_card(card_index, new_front, new_back)
+            input_frame.pack_forget()
+            self.show_edit_screen()
+        
+        save_button = ctk.CTkButton(input_frame, text="Save Card", command=save_card,
+                                    fg_color="#2ecc71", hover_color="#27ae60", height=40, corner_radius=10)
+        save_button.pack(pady=(10, 20))
 
     def delete_card(self, card_index):
         if messagebox.askyesno("Confirm Deletion", f"Are you sure you want to delete this card?"):
@@ -271,12 +304,28 @@ class FlashcardGUI:
         self.show_edit_screen()
 
     def add_card_to_current_set(self):
-        front = simpledialog.askstring("New Card", "Enter the question:")
-        if front:
-            back = simpledialog.askstring("New Card", "Enter the answer:")
-            if back:
+        input_frame = ctk.CTkFrame(self.main_frame, fg_color="white", corner_radius=10)
+        input_frame.pack(fill=tk.X, padx=20, pady=20)
+        
+        ctk.CTkLabel(input_frame, text="Question:", font=("Roboto", 14)).pack(anchor="w", padx=15, pady=(10, 5))
+        front_entry = ctk.CTkEntry(input_frame)
+        front_entry.pack(fill=tk.X, padx=15, pady=(0, 10))
+        
+        ctk.CTkLabel(input_frame, text="Answer:", font=("Roboto", 14)).pack(anchor="w", padx=15, pady=(10, 5))
+        back_entry = ctk.CTkEntry(input_frame)
+        back_entry.pack(fill=tk.X, padx=15, pady=(0, 10))
+        
+        def save_card():
+            front = front_entry.get()
+            back = back_entry.get()
+            if front and back:
                 self.current_set.add_card(front, back)
-        self.show_edit_screen()
+            input_frame.pack_forget()
+            self.show_edit_screen()
+        
+        save_button = ctk.CTkButton(input_frame, text="Save Card", command=save_card,
+                                    fg_color="#2ecc71", hover_color="#27ae60", height=40, corner_radius=10)
+        save_button.pack(pady=(10, 20))
 
     def on_closing(self):
         """ Handle the window closing event."""
@@ -303,6 +352,7 @@ class FlashcardGUI:
                                     fg_color="#95a5a6", hover_color="#7f8c8d",
                                     height=50, corner_radius=10)
         back_button.pack(padx=20, pady=(0, 20), fill=tk.X)
+
 
 
 
