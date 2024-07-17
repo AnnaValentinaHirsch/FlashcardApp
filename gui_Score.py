@@ -409,13 +409,13 @@ class FlashcardGUI:
         if user_answer.strip().lower() == card.back.strip().lower():
             card.mark_correct()
             self.answer_message_label.configure(text="Correct!", text_color="green")
-            self.user_answer_entry.configure(fg_color="green")
+            self.user_answer_entry.configure(border_color="green")
         else:
             card.mark_incorrect()
             self.answer_message_label.configure(
                 text=f"Incorrect! The correct answer was: {card.back}", text_color="red"
             )
-            self.user_answer_entry.configure(fg_color="red")
+            self.user_answer_entry.configure(border_color="red")
 
     def show_answer(self, answer_label):
         card = self.current_set.cards[self.current_card_index]
@@ -655,15 +655,20 @@ class FlashcardGUI:
         stats_frame = ctk.CTkFrame(self.main_frame, fg_color="white", corner_radius=10)
         stats_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
-        total_score = sum(deck.total_score() for deck in self.flashcard_sets)
-        total_reviews = sum(deck.success_rate() for deck in self.flashcard_sets)
+        total_correct = sum(
+            card.correct_count for deck in self.flashcard_sets for card in deck.cards
+        )
+        total_reviews = sum(
+            card.review_count for deck in self.flashcard_sets for card in deck.cards
+        )
+
         if total_reviews == 0:
             success_rate = 0
         else:
-            success_rate = total_score / total_reviews
+            success_rate = (total_correct / total_reviews) * 100
 
         ctk.CTkLabel(
-            stats_frame, text=f"Total Score: {total_score}", font=("Roboto", 18)
+            stats_frame, text=f"Total Score: {total_correct}", font=("Roboto", 18)
         ).pack(pady=10)
         ctk.CTkLabel(
             stats_frame, text=f"Success Rate: {success_rate:.2f}%", font=("Roboto", 18)
