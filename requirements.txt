@@ -2,4 +2,3 @@ numpy
 tk
 jupyter
 customtkinter
-re
