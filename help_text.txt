@@ -1,5 +1,5 @@
 # Welcome to the Flashcard App!
-## A little help on how use this app.
+## A little help on how to use this app.
 ### 1. Create a New Deck
 * Click on the "+ Create New Deck" button.
 * Enter a title for your new deck.
