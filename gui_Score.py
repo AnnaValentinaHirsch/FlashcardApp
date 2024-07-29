@@ -3,7 +3,7 @@ from tkinter import messagebox, simpledialog, ttk, filedialog
 import customtkinter as ctk
 import random
 import json
-from help_screen import HelpScreen  # Import the HelpScreen class
+from help_screen import HelpScreen  # Import the HelpScreen class from help_screen.py
 
 
 class FlashCard:
