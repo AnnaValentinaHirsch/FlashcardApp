@@ -9,10 +9,7 @@ class CardEditor:
     def __init__(self, app):
         self.app = app
 
-    def show_add_cards_input(self, set_index=None):
-        if set_index is not None:
-            self.app.current_set = self.app.flashcard_sets[set_index]
-
+    def show_add_cards_input(self):
         for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
@@ -35,30 +32,35 @@ class CardEditor:
         )
         self.card_question_entry = ctk.CTkEntry(input_frame, width=300)
         self.card_question_entry.pack(pady=10)
+        self.card_question_entry.bind("<Return>", lambda event: self.card_answer_entry.focus_set())
 
         ctk.CTkLabel(input_frame, text="Answer:", font=("Roboto", 16)).pack(
             anchor="w", padx=15, pady=(10, 5)
         )
         self.card_answer_entry = ctk.CTkEntry(input_frame, width=300)
         self.card_answer_entry.pack(pady=10)
+        self.card_answer_entry.bind("<Return>", lambda event: self.add_card_from_input())
 
         self.feedback_label = ctk.CTkLabel(input_frame, text="", font=("Roboto", 14))
         self.feedback_label.pack(pady=10)
 
-        ctk.CTkButton(
+        add_button = ctk.CTkButton(
             input_frame,
             text="Add Card",
             command=self.add_card_from_input,
             fg_color="#2ecc71",
             hover_color="#27ae60",
-        ).pack(pady=10)
-        ctk.CTkButton(
+        )
+        add_button.pack(pady=10)
+
+        finish_button = ctk.CTkButton(
             input_frame,
             text="Finish Adding Cards",
             command=self.finish_adding_cards,
             fg_color="#3498db",
             hover_color="#2980b9",
-        ).pack(pady=10)
+        )
+        finish_button.pack(pady=10)
 
     def add_card_from_input(self):
         front = self.card_question_entry.get()
@@ -68,9 +70,10 @@ class CardEditor:
             self.card_question_entry.delete(0, tk.END)
             self.card_answer_entry.delete(0, tk.END)
             self.feedback_label.configure(text="Card added successfully!", text_color="green")
-            self.card_question_entry.focus_set()  # Set focus back to question entry
+            self.card_question_entry.focus_set()
         else:
             self.feedback_label.configure(text="Please fill in both question and answer.", text_color="red")
+
 
     def finish_adding_cards(self):
         front = self.card_question_entry.get()
