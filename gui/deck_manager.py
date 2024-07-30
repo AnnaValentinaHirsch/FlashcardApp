@@ -4,12 +4,18 @@ from cards.flashcard_set import FlashCardSet
 
 class DeckManager:
     def __init__(self, app):
+        self.new_deck_title_entry = None
         self.app = app
 
     def show_deck_manager(self):
+        """
+        Show the deck manager screen. This screen displays all the decks the user has created or imported.
+        """
+        # Clear the main frame
         for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
+        # Create the header
         header_frame = ctk.CTkFrame(
             self.app.main_frame, fg_color="#3498db", corner_radius=0
         )
@@ -21,6 +27,7 @@ class DeckManager:
             text_color="white",
         ).pack(pady=20)
 
+        # Make frame scrollable
         scroll_frame = ctk.CTkScrollableFrame(self.app.main_frame, fg_color="#F0F0F0")
         scroll_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
         self.app.bind_mousewheel(scroll_frame)
@@ -28,6 +35,7 @@ class DeckManager:
         for i, deck in enumerate(self.app.flashcard_sets):
             self.create_deck_card(scroll_frame, deck, i)
 
+        # Create buttons
         new_deck_button = ctk.CTkButton(
             self.app.main_frame,
             text="+ Create New Deck",
@@ -95,6 +103,10 @@ class DeckManager:
         exit_button.pack(padx=20, pady=(0, 20), fill=tk.X)
 
     def create_deck_card(self, parent, deck, index):
+        """
+        Create a card that represents a deck. This card displays the deck's title and the number of cards in the deck.
+        """
+        # Create the card frame
         card_frame = ctk.CTkFrame(parent, fg_color="white", corner_radius=10)
         card_frame.pack(fill=tk.X, pady=5)
 
@@ -108,6 +120,7 @@ class DeckManager:
         button_frame = ctk.CTkFrame(card_frame, fg_color="transparent")
         button_frame.pack(fill=tk.X, padx=15, pady=(0, 10))
 
+        # Start Learning Button
         ctk.CTkButton(
             button_frame,
             text="Study",
@@ -117,6 +130,7 @@ class DeckManager:
             width=80,
         ).pack(side=tk.LEFT, padx=(0, 10))
 
+        # Edit Button
         ctk.CTkButton(
             button_frame,
             text="Edit",
@@ -126,6 +140,7 @@ class DeckManager:
             width=80,
         ).pack(side=tk.LEFT, padx=(0, 10))
 
+        # View Stats Button
         ctk.CTkButton(
             button_frame,
             text="Statistics",
@@ -135,6 +150,7 @@ class DeckManager:
             width=80,
         ).pack(side=tk.LEFT, padx=(0, 10))
 
+        # Delete Button
         ctk.CTkButton(
             button_frame,
             text="Delete",
@@ -145,6 +161,9 @@ class DeckManager:
         ).pack(side=tk.RIGHT)
 
     def confirm_delete_deck(self, index):
+        """
+        Show a confirmation dialog before deleting a deck.
+        """
         self.app.message_box.show_confirmation(
             "Delete Deck",
             f"Are you sure you want to delete the deck '{self.app.flashcard_sets[index].title}'?",
@@ -153,10 +172,16 @@ class DeckManager:
         )
 
     def delete_deck(self, index):
+        """
+        Delete a deck from the list of decks.
+        """
         del self.app.flashcard_sets[index]
         self.show_deck_manager()
 
     def start_learning_or_add_cards(self, set_index):
+        """
+        Start a learning session or show the "add cards -prompt" based on whether the deck has cards or not.
+        """
         if not self.app.flashcard_sets[set_index].cards:
             self.app.message_box.show_message(
                 "Empty Deck",
@@ -167,6 +192,9 @@ class DeckManager:
             self.app.learning_session.start_learning(set_index)
 
     def show_new_deck_input(self):
+        """
+        Show an input field for the user to create a new deck.
+        """
         for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
@@ -181,16 +209,19 @@ class DeckManager:
             text_color="white",
         ).pack(pady=20)
 
+        # Frame to ask for the deck title
         input_frame = ctk.CTkFrame(self.app.main_frame, fg_color="white", corner_radius=10)
         input_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
         ctk.CTkLabel(input_frame, text="Deck Title:", font=("Roboto", 16)).pack(
             anchor="w", padx=15, pady=(10, 5)
         )
+        # Entry field for the deck title
         self.new_deck_title_entry = ctk.CTkEntry(input_frame, width=300)
         self.new_deck_title_entry.pack(pady=10)
         self.new_deck_title_entry.bind("<Return>", lambda event: self.create_new_set_from_input())
 
+        # Create Deck Buttom
         create_button = ctk.CTkButton(
             input_frame,
             text="Create Deck",
@@ -200,6 +231,7 @@ class DeckManager:
         )
         create_button.pack(pady=10)
 
+        # Cancel Button
         cancel_button = ctk.CTkButton(
             input_frame,
             text="Cancel",
@@ -210,6 +242,9 @@ class DeckManager:
         cancel_button.pack(pady=10)
 
     def create_new_set_from_input(self):
+        """
+        Create a new deck based on the input from the user. Add the deck to the list of decks.
+        """
         title = self.new_deck_title_entry.get()
         if title:
             new_set = FlashCardSet(title)
