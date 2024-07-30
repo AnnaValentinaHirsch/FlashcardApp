@@ -1,9 +1,9 @@
 import tkinter as tk
-from tkinter import messagebox, simpledialog, ttk, filedialog
+from tkinter import messagebox, filedialog
 import customtkinter as ctk
 import random
 import json
-from help_screen import HelpScreen  # Import the HelpScreen class from help_screen.py
+from utils.help_screen import HelpScreen  # Import the HelpScreen class from help_screen.py
 
 
 class FlashCard:
@@ -48,13 +48,13 @@ class FlashCardSet:
     def to_dict(self):
         return {
             "title": self.title,
-            "cards": [{"front": card.front, "back": card.back} for card in self.cards],
+            "models": [{"front": card.front, "back": card.back} for card in self.cards],
         }
 
     @classmethod
     def from_dict(cls, data):
         set_instance = cls(data["title"])
-        for card_data in data["cards"]:
+        for card_data in data["models"]:
             set_instance.add_card(card_data["front"], card_data["back"])
         return set_instance
 
@@ -82,6 +82,7 @@ class FlashcardGUI:
         self.flashcard_sets = []
         self.current_set = None
         self.current_card_index = 0
+        self.cards_to_review = []
 
         self.init_ui()
 
@@ -110,6 +111,9 @@ class FlashcardGUI:
 
         scroll_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="#F0F0F0")
         scroll_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
+
+        # Bind mouse wheel to scrollable frame
+        scroll_frame.bind_all("<MouseWheel>", lambda e: self._on_mousewheel(e, scroll_frame))
 
         for i, deck in enumerate(self.flashcard_sets):
             self.create_deck_card(scroll_frame, deck, i)
@@ -180,6 +184,9 @@ class FlashcardGUI:
         )
         help_button.pack(padx=20, pady=(0, 20), fill=tk.X)
 
+    def _on_mousewheel(self, event, widget):
+        widget.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
     def create_deck_card(self, parent, deck, index):
         card_frame = ctk.CTkFrame(parent, fg_color="white", corner_radius=10)
         card_frame.pack(fill=tk.X, pady=5)
@@ -188,7 +195,7 @@ class FlashcardGUI:
             anchor="w", padx=15, pady=(10, 5)
         )
         ctk.CTkLabel(
-            card_frame, text=f"{len(deck.cards)} cards", font=("Roboto", 14)
+            card_frame, text=f"{len(deck.cards)} models", font=("Roboto", 14)
         ).pack(anchor="w", padx=15, pady=(0, 10))
 
         button_frame = ctk.CTkFrame(card_frame, fg_color="transparent")
@@ -306,10 +313,18 @@ class FlashcardGUI:
         ctk.CTkButton(
             input_frame,
             text="Finish Adding Cards",
-            command=self.show_deck_manager,
+            command=self.finish_adding_cards,
             fg_color="#3498db",
             hover_color="#2980b9",
         ).pack(pady=10)
+
+    def finish_adding_cards(self):
+        # Save the last card if it's not empty
+        front = self.card_question_entry.get()
+        back = self.card_answer_entry.get()
+        if front and back:
+            self.current_set.add_card(front, back)
+        self.show_deck_manager()
 
     def add_card_from_input(self):
         front = self.card_question_entry.get()
@@ -323,19 +338,24 @@ class FlashcardGUI:
         self.current_set = self.flashcard_sets[set_index]
         if not self.current_set.cards:
             messagebox.showinfo(
-                "Empty Deck", "This deck has no cards. Add some cards first."
+                "Empty Deck", "This deck has no models. Add some models first."
             )
             return
 
         self.current_card_index = 0
-        random.shuffle(self.current_set.cards)
+        self.cards_to_review = self.current_set.cards.copy()
+        random.shuffle(self.cards_to_review)
         self.show_flashcard()
 
     def show_flashcard(self):
         for widget in self.main_frame.winfo_children():
             widget.destroy()
 
-        card = self.current_set.cards[self.current_card_index]
+        if not self.cards_to_review:
+            self.end_learning_session()
+            return
+
+        card = self.cards_to_review[self.current_card_index]
 
         header_frame = ctk.CTkFrame(
             self.main_frame, fg_color="#3498db", corner_radius=0
@@ -368,14 +388,14 @@ class FlashcardGUI:
             "<Return>", lambda event: self.check_answer(self.user_answer_entry.get())
         )
 
-        check_answer_btn = ctk.CTkButton(
+        self.check_answer_btn = ctk.CTkButton(
             card_frame,
             text="Check Answer",
             command=lambda: self.check_answer(self.user_answer_entry.get()),
             fg_color="#3498db",
             hover_color="#2980b9",
         )
-        check_answer_btn.pack(pady=10)
+        self.check_answer_btn.pack(pady=10)
 
         nav_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         nav_frame.pack(fill=tk.X, padx=20, pady=20)
@@ -399,17 +419,25 @@ class FlashcardGUI:
         ctk.CTkButton(
             self.main_frame,
             text="End Session",
-            command=self.show_deck_manager,
+            command=self.end_learning_session,
             fg_color="#e74c3c",
             hover_color="#c0392b",
         ).pack(pady=10)
 
+    def end_learning_session(self):
+        messagebox.showinfo("Session Ended", "You have reviewed all models in this deck!")
+        self.show_deck_manager()
+
+
+
+
     def check_answer(self, user_answer):
-        card = self.current_set.cards[self.current_card_index]
+        card = self.cards_to_review[self.current_card_index]
         if user_answer.strip().lower() == card.back.strip().lower():
             card.mark_correct()
             self.answer_message_label.configure(text="Correct!", text_color="green")
             self.user_answer_entry.configure(border_color="green")
+            self.check_answer_btn.pack_forget()  # Hide the check answer button
         else:
             card.mark_incorrect()
             self.answer_message_label.configure(
@@ -417,20 +445,17 @@ class FlashcardGUI:
             )
             self.user_answer_entry.configure(border_color="red")
 
+
     def show_answer(self, answer_label):
         card = self.current_set.cards[self.current_card_index]
         answer_label.configure(text=card.back)
 
     def prev_card(self):
-        self.current_card_index = (self.current_card_index - 1) % len(
-            self.current_set.cards
-        )
+        self.current_card_index = (self.current_card_index - 1) % len(self.cards_to_review)
         self.show_flashcard()
 
     def next_card(self):
-        self.current_card_index = (self.current_card_index + 1) % len(
-            self.current_set.cards
-        )
+        self.current_card_index = (self.current_card_index + 1) % len(self.cards_to_review)
         self.show_flashcard()
 
     def edit_set(self, set_index):
