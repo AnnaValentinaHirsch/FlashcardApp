@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 import tkinter.font as tkfont
 import re
+from typing import Any
 
 class SimpleMarkdownText(tk.Frame):
     """
@@ -127,28 +128,28 @@ class HelpScreen:
     A class to represent the Help screen of the application.
 
     Attributes:
-        parent_frame (tk.Frame): The parent frame in which the help screen is displayed.
+        app (Any): The main application object.
 
     Methods:
         set_default_font(): Sets the default font to Roboto if available.
         show(): Displays the help screen with instructions on how the app works.
         load_help_text(): Loads the help text from a file.
     """
-    def __init__(self, parent_frame):
+    def __init__(self, app: Any):
         """
-        Initializes the HelpScreen with the given parent frame.
+        Initializes the HelpScreen with the given application object.
 
         Args:
-            parent_frame (tk.Frame): The parent frame in which the help screen is displayed.
+            app (Any): The main application object.
         """
-        self.parent_frame = parent_frame
+        self.app = app
 
         # Set the default font to Roboto if available
         self.set_default_font()
 
-    def set_default_font(self):
+    def set_default_font(self) -> None:
         """
-        Sets the default font to Roboto if it is available on the system 
+        Sets the default font to Roboto if it is available on the system
         to make the text look nice.
         If Roboto is not available, it falls back to the default font.
         """
@@ -158,21 +159,21 @@ class HelpScreen:
         except tk.TclError:
             print("Roboto font is not available. Using default font.")
 
-    def show(self):
+    def show(self) -> None:
         """
         Displays the help screen, explaining how the application works.
-        It clears any existing widgets in the parent frame and creates a new help screen layout.
+        It clears any existing widgets in the main frame and creates a new help screen layout.
         """
-        for widget in self.parent_frame.winfo_children():
+        for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
         # Header
-        header_frame = ctk.CTkFrame(self.parent_frame, fg_color="#3498db", corner_radius=0)
+        header_frame = ctk.CTkFrame(self.app.main_frame, fg_color="#3498db", corner_radius=0)
         header_frame.pack(fill=tk.X, pady=(0, 20))
         ctk.CTkLabel(header_frame, text="Help", font=("Roboto", 24, "bold"), text_color="white").pack(pady=20)
 
         # Scrollable frame for help
-        scroll_frame = ctk.CTkScrollableFrame(self.parent_frame, fg_color="#F0F0F0")
+        scroll_frame = ctk.CTkScrollableFrame(self.app.main_frame, fg_color="#F0F0F0")
         scroll_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
 
         # Help text
@@ -180,7 +181,19 @@ class HelpScreen:
         markdown_widget = SimpleMarkdownText(scroll_frame, help_text, bg="#F0F0F0")
         markdown_widget.pack(fill='both', expand=True)
 
-    def load_help_text(self):
+        # Back Button
+        back_button = ctk.CTkButton(
+            self.app.main_frame,
+            text="Back to Decks",
+            command=self.app.deck_manager.show_deck_manager,
+            fg_color="#95a5a6",
+            hover_color="#7f8c8d",
+            height=50,
+            corner_radius=10,
+        )
+        back_button.pack(padx=20, pady=(0, 20), fill=tk.X)
+
+    def load_help_text(self) -> str:
         """
         Loads the help text from a file named 'help_text.txt'.
 
