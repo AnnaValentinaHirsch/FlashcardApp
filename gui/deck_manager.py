@@ -1,6 +1,6 @@
 import tkinter as tk
 import customtkinter as ctk
-from models.flashcard_set import FlashCardSet
+from cards.flashcard_set import FlashCardSet
 
 class DeckManager:
     def __init__(self, app):
@@ -189,21 +189,25 @@ class DeckManager:
         )
         self.new_deck_title_entry = ctk.CTkEntry(input_frame, width=300)
         self.new_deck_title_entry.pack(pady=10)
+        self.new_deck_title_entry.bind("<Return>", lambda event: self.create_new_set_from_input())
 
-        ctk.CTkButton(
+        create_button = ctk.CTkButton(
             input_frame,
             text="Create Deck",
             command=self.create_new_set_from_input,
             fg_color="#2ecc71",
             hover_color="#27ae60",
-        ).pack(pady=10)
-        ctk.CTkButton(
+        )
+        create_button.pack(pady=10)
+
+        cancel_button = ctk.CTkButton(
             input_frame,
             text="Cancel",
             command=self.show_deck_manager,
             fg_color="#95a5a6",
             hover_color="#7f8c8d",
-        ).pack(pady=10)
+        )
+        cancel_button.pack(pady=10)
 
     def create_new_set_from_input(self):
         title = self.new_deck_title_entry.get()
