@@ -24,14 +24,51 @@ Run `main.py` to test the app with the interface.
 
 ## User Interface
 
-| Section               | Description                                                                                              |
-|-----------------------|----------------------------------------------------------------------------------------------------------|
-| **Main Screen**       | The main screen displays a list of all created decks. Each deck is represented by a card showing the deck title and number of cards. Options available on the main screen include:<br>- Create New Deck<br>- Export Decks<br>- Import Decks<br>- View Overall Statistics<br>- Access Help<br>- Exit Application |
-| **Deck Creation and Editing** | **To create a new deck:**<br>1. Click "Create New Deck" on the main screen<br>2. Enter a title for the deck<br>3. Press Enter or click "Create Deck"<br><br>**To edit a deck:**<br>1. Click "Edit" on the deck card<br>2. Modify card contents, add new cards, or delete existing cards |
-| **Card Creation and Editing** | **To add a new card:**<br>1. Enter the question in the "Question" field<br>2. Press Enter to move to the "Answer" field<br>3. Enter the answer<br>4. Press Enter or click "Add Card"<br><br>**To edit a card:**<br>1. In the deck editing view, select the card to edit<br>2. Modify the question or answer as needed<br>3. Save changes |
-| **Study Session Interface** | The study session screen shows:<br>- Current card number and total cards<br>- Question field<br>- Answer input field<br>- "Check Answer" and "Show Answer" buttons<br>- Navigation buttons (Previous, Next, End Session) |
-| **Statistics View**   | Statistics are displayed for individual decks and overall performance, showing:<br>- Total cards reviewed<br>- Correct answers<br>- Success rate |
+### Main Screen
 
+The main screen displays a list of all created decks. Each deck is represented by a card showing the deck title and number of cards. Options available on the main screen include:
+
+- Create New Deck
+- Export Decks
+- Import Decks
+- View Overall Statistics
+- Access Help
+- Exit Application
+
+### Deck Creation and Editing
+
+| Action                    | Steps                                                                                                                   |
+|---------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| **Create new deck:**      | 1. Click "Create New Deck" on the main screen<br>2. Enter a title for the deck<br>3. Press Enter or click "Create Deck" |
+| **Edit deck:**   | 1. Click "Edit" on the "your decks" menu<br>2. Modify card contents, add new cards, or delete existing cards            |
+| **Delete deck:** | 1. Click "Delete" on the "your decks" menu<br>2. Confirm Deletion.                                                      |
+
+
+### Card Creation and Editing
+
+| Action                 | Steps                                                                 |
+|------------------------|-----------------------------------------------------------------------|
+| **Add card:**   | 1. Enter the question in the "Question" field<br>2. Press Enter to move to the "Answer" field<br>3. Enter the answer<br>4. Press Enter or click "Add Card" |
+| **Edit card:** | 1. In the deck editing view, select the card to edit<br>2. Modify the question or answer as needed<br>3. Save changes |
+
+
+### Study Session Interface
+
+The study session screen shows:
+
+- Current card number and total cards
+- Question field
+- Answer input field
+- "Check Answer" and "Show Answer" buttons
+- Navigation buttons (Previous, Next, End Session)
+
+### Statistics View
+
+Statistics are displayed for individual decks and overall performance, showing:
+
+- Total cards reviewed
+- Correct answers
+- Success rate
 
 ## Key Components
 
