@@ -10,9 +10,25 @@ class CardEditor:
         self.app = app
 
     def show_add_cards_input(self):
+        """
+        Show the input fields for adding new cards to the current set.
+
+        UI Specifications:
+            - Create a header frame with a title that includes the current set's title.
+            - Create an input frame with two input fields for the question and answer of the card.
+            - Create a feedback label to display messages to the user.
+            - Create an "Add Card" button that calls the add_card_from_input method.
+            - Create a "Finish Adding Cards" button that calls the finish_adding_cards method.
+
+        Keyboard Bindings:
+            - Pressing the Enter key on the question input field should focus on the answer input field.
+            - Pressing the Enter key on the answer input field should call the add_card_from_input method.
+        """
+        # Clear the main frame
         for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
+        # Create the header frame
         header_frame = ctk.CTkFrame(
             self.app.main_frame, fg_color="#3498db", corner_radius=0
         )
@@ -24,9 +40,11 @@ class CardEditor:
             text_color="white",
         ).pack(pady=20)
 
+        # Create the input frame
         input_frame = ctk.CTkFrame(self.app.main_frame, fg_color="white", corner_radius=10)
         input_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
+        # Question Entry
         ctk.CTkLabel(input_frame, text="Question:", font=("Roboto", 16)).pack(
             anchor="w", padx=15, pady=(10, 5)
         )
@@ -34,16 +52,20 @@ class CardEditor:
         self.card_question_entry.pack(pady=10)
         self.card_question_entry.bind("<Return>", lambda event: self.card_answer_entry.focus_set())
 
+        # Answer Entry
         ctk.CTkLabel(input_frame, text="Answer:", font=("Roboto", 16)).pack(
             anchor="w", padx=15, pady=(10, 5)
         )
+
         self.card_answer_entry = ctk.CTkEntry(input_frame, width=300)
         self.card_answer_entry.pack(pady=10)
         self.card_answer_entry.bind("<Return>", lambda event: self.add_card_from_input())
 
+        # Feedback Label
         self.feedback_label = ctk.CTkLabel(input_frame, text="", font=("Roboto", 14))
         self.feedback_label.pack(pady=10)
 
+        # Add Card Button
         add_button = ctk.CTkButton(
             input_frame,
             text="Add Card",
@@ -53,6 +75,7 @@ class CardEditor:
         )
         add_button.pack(pady=10)
 
+        # Finish Adding Cards Button
         finish_button = ctk.CTkButton(
             input_frame,
             text="Finish Adding Cards",
@@ -63,8 +86,14 @@ class CardEditor:
         finish_button.pack(pady=10)
 
     def add_card_from_input(self):
+        """
+        Add a card to the current set using the input fields. Checks if both fields are filled.
+        """
+        # Retrieve question and answer from the input fields
         front = self.card_question_entry.get()
         back = self.card_answer_entry.get()
+
+        # Check if both fields (Question & Answer) are filled
         if front and back:
             self.app.current_set.add_card(front, back)
             self.card_question_entry.delete(0, tk.END)
@@ -76,6 +105,10 @@ class CardEditor:
 
 
     def finish_adding_cards(self):
+        """
+        Finish adding cards to the current set and return to the deck manager screen.
+        The last added content is automatically saved if the input fields are filled.
+        """
         front = self.card_question_entry.get()
         back = self.card_answer_entry.get()
         if front and back:
@@ -83,13 +116,21 @@ class CardEditor:
         self.app.deck_manager.show_deck_manager()
 
     def edit_set(self, set_index):
+        """
+        Set the current set to the set at the given index and show the edit screen.
+        """
         self.app.current_set = self.app.flashcard_sets[set_index]
         self.show_edit_screen()
 
     def show_edit_screen(self):
+        """
+        Show the edit screen for the current set.
+        """
+        # Clear the main frame
         for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
+        # Create the header frame
         header_frame = ctk.CTkFrame(
             self.app.main_frame, fg_color="#3498db", corner_radius=0
         )
@@ -101,9 +142,11 @@ class CardEditor:
             text_color="white",
         ).pack(pady=20)
 
+        # Make the frame scrollable
         scroll_frame = ctk.CTkScrollableFrame(self.app.main_frame, fg_color="#F0F0F0")
         scroll_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
 
+        # Display each card in the set with edit and delete buttons
         for i, card in enumerate(self.app.current_set.cards):
             card_frame = ctk.CTkFrame(scroll_frame, fg_color="white", corner_radius=10)
             card_frame.pack(fill=tk.X, pady=5)
@@ -135,6 +178,7 @@ class CardEditor:
                 width=60,
             ).pack(side=tk.LEFT)
 
+        # Add New Card Button
         new_card_button = ctk.CTkButton(
             self.app.main_frame,
             text="+ Add New Card",
@@ -146,6 +190,7 @@ class CardEditor:
         )
         new_card_button.pack(padx=20, pady=(0, 10), fill=tk.X)
 
+        # Delete Deck Button
         delete_deck_button = ctk.CTkButton(
             self.app.main_frame,
             text="Delete Deck",
@@ -157,6 +202,7 @@ class CardEditor:
         )
         delete_deck_button.pack(padx=20, pady=(0, 10), fill=tk.X)
 
+        # Back Button
         back_button = ctk.CTkButton(
             self.app.main_frame,
             text="Back to Decks",
@@ -169,10 +215,16 @@ class CardEditor:
         back_button.pack(padx=20, pady=(0, 20), fill=tk.X)
 
     def show_edit_card_input(self, card_index):
+        """
+        Show the input fields to edit the card at the given index.
+        """
+        # Get the card index to edit
         card = self.app.current_set.cards[card_index]
+        # Clear the main frame
         for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
+        # Create the header frame
         header_frame = ctk.CTkFrame(
             self.app.main_frame, fg_color="#3498db", corner_radius=0
         )
@@ -184,12 +236,14 @@ class CardEditor:
             text_color="white",
         ).pack(pady=20)
 
+        # Create the input frame
         input_frame = ctk.CTkFrame(self.app.main_frame, fg_color="white", corner_radius=10)
         input_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
         ctk.CTkLabel(input_frame, text="Question:", font=("Roboto", 16)).pack(
             anchor="w", padx=15, pady=(10, 5)
         )
+        # Question Entry
         self.edit_card_question_entry = ctk.CTkEntry(input_frame, width=300)
         self.edit_card_question_entry.insert(0, card.front)
         self.edit_card_question_entry.pack(pady=10)
@@ -197,10 +251,12 @@ class CardEditor:
         ctk.CTkLabel(input_frame, text="Answer:", font=("Roboto", 16)).pack(
             anchor="w", padx=15, pady=(10, 5)
         )
+        # Answer Entry
         self.edit_card_answer_entry = ctk.CTkEntry(input_frame, width=300)
         self.edit_card_answer_entry.insert(0, card.back)
         self.edit_card_answer_entry.pack(pady=10)
 
+        # Save Changes Button
         ctk.CTkButton(
             input_frame,
             text="Save Changes",
@@ -217,6 +273,9 @@ class CardEditor:
         ).pack(pady=10)
 
     def save_card_edit(self, card_index):
+        """
+        Save the changes made to the card.
+        """
         new_front = self.edit_card_question_entry.get()
         new_back = self.edit_card_answer_entry.get()
         if new_front and new_back:
@@ -224,6 +283,9 @@ class CardEditor:
         self.show_edit_screen()
 
     def delete_current_deck(self):
+        """
+        Delete the current deck from the app's flashcard_sets list. Ask for confirmation before deleting.
+        """
         if messagebox.askyesno(
                 "Confirm Deletion",
                 f"Are you sure you want to delete the deck '{self.app.current_set.title}'?",
@@ -232,6 +294,9 @@ class CardEditor:
             self.app.deck_manager.show_deck_manager()
 
     def delete_card(self, card_index):
+        """
+        Delete the card from the current set. Ask for confirmation before deleting.
+        """
         if messagebox.askyesno(
                 "Confirm Deletion", f"Are you sure you want to delete this card?"
         ):
