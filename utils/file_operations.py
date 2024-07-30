@@ -1,6 +1,6 @@
 import json
 from tkinter import filedialog
-from models.flashcard_set import FlashCardSet
+from cards.flashcard_set import FlashCardSet
 
 class FileOperations:
     def __init__(self, app):
