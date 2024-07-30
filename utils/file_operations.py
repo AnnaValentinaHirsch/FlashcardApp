@@ -2,11 +2,15 @@ import json
 from tkinter import filedialog
 from cards.flashcard_set import FlashCardSet
 
+
 class FileOperations:
     def __init__(self, app):
         self.app = app
 
     def export_flashcard_sets(self):
+        """
+        Export the flashcard sets to a JSON file. The user can select the file path where the flashcard sets will be saved.
+        """
         file_path = filedialog.asksaveasfilename(
             defaultextension=".json",
             filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
@@ -20,6 +24,10 @@ class FileOperations:
             )
 
     def import_flashcard_sets(self):
+        """
+        Import flashcard sets from a JSON file. The user can select the file path from which the flashcard sets will
+        be imported. The imported flashcard sets will be added to the existing flashcard sets. Exceptions are handled.
+        """
         file_path = filedialog.askopenfilename(
             defaultextension=".json",
             filetypes=[("JSON files", "*.json"), ("All files", "*.*")],

@@ -1,23 +1,28 @@
 import tkinter as tk
 import customtkinter as ctk
 
+
 class MessageBox:
     def __init__(self, app):
         self.app = app
 
-    def show_message(self, title, message, type="info"):
+    def show_message(self, title, message, type="info"): # TODO implement message types properly
+        # Clear the main frame
         for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
+       # Create the message box layout
         header_frame = ctk.CTkFrame(self.app.main_frame, fg_color="#3498db", corner_radius=0)
         header_frame.pack(fill=tk.X, pady=(0, 20))
         ctk.CTkLabel(header_frame, text=title, font=("Roboto", 24, "bold"), text_color="white").pack(pady=20)
 
+        # Create the message frame
         message_frame = ctk.CTkFrame(self.app.main_frame, fg_color="white", corner_radius=10)
         message_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
         ctk.CTkLabel(message_frame, text=message, font=("Roboto", 14), wraplength=300).pack(pady=20)
 
+        # Create the OK button
         ok_button = ctk.CTkButton(
             message_frame,
             text="OK",
@@ -30,6 +35,9 @@ class MessageBox:
         ok_button.bind("<Return>", lambda event: ok_button.invoke())  # Bind Enter key to OK button
 
     def show_confirmation(self, title, message, on_yes, on_no):
+        """
+        Show a confirmation message box with Yes and No buttons. Used across modules to confirm actions.
+        """
         for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
