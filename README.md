@@ -2,12 +2,14 @@
 
 Run `main.py` to test the app with the interface.
 
+Run `pip install -r requirements.txt` to install required packages.
+
 ## System Requirements
 
 - Python 3.8 or higher
 - Required libraries:
-  - `tkinter` (usually comes pre-installed with Python)
-  - `customtkinter` (install via pip: `pip install customtkinter`)
+  - `tkinter` 
+  - `customtkinter` 
 
 ## Main Features
 
