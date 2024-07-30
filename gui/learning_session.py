@@ -2,6 +2,7 @@ import tkinter as tk
 import customtkinter as ctk
 import random
 
+
 class LearningSession:
     def __init__(self, app):
         self.app = app
@@ -10,6 +11,9 @@ class LearningSession:
         self.reviewed_cards = 0
 
     def start_learning(self, set_index):
+        """
+        Start a learning session with the selected deck. If the deck is empty, show a message to add cards.
+        """
         self.app.current_set = self.app.flashcard_sets[set_index]
         if not self.app.current_set.cards:
             self.show_empty_deck_message(set_index)
@@ -18,12 +22,18 @@ class LearningSession:
             self.show_flashcard()
 
     def initialize_session(self):
+        """
+        Initialise the learning session by shuffling the cards and setting the current card index to 0.
+        """
         self.current_card_index = 0
         self.cards_to_review = self.app.current_set.cards.copy()
         random.shuffle(self.cards_to_review)
         self.reviewed_cards = 0
 
     def show_flashcard(self):
+        """
+        Show the flashcard to the user. If all cards have been reviewed, end the learning session.
+        """
         for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
@@ -85,6 +95,9 @@ class LearningSession:
         self.create_navigation_buttons()
 
     def create_navigation_buttons(self):
+        """
+        Create the navigation buttons to move between flashcards within a running learning session.
+        """
         nav_frame = ctk.CTkFrame(self.app.main_frame, fg_color="transparent")
         nav_frame.pack(fill=tk.X, padx=20, pady=20)
 
@@ -113,6 +126,9 @@ class LearningSession:
         ).pack(pady=10)
 
     def check_answer(self):
+        """
+        Check the user's answer against the correct answer and provide feedback.
+        """
         user_answer = self.user_answer_entry.get()
         card = self.cards_to_review[self.current_card_index]
         if user_answer.strip().lower() == card.back.strip().lower():
@@ -124,11 +140,17 @@ class LearningSession:
             self.answer_message_label.configure(text="Incorrect. Try again or show the answer.", text_color="red")
 
     def show_answer(self):
+        """
+        Reveals the correct answer if prompted by the user.
+        """
         card = self.cards_to_review[self.current_card_index]
         self.answer_message_label.configure(text=f"The correct answer is: {card.back}", text_color="blue")
         self.show_continue_button()
 
     def show_continue_button(self):
+        """
+        Show the continue button after the user has answered the flashcard correctly.
+        """
         for widget in self.button_frame.winfo_children():
             widget.destroy()
 
@@ -144,12 +166,18 @@ class LearningSession:
         continue_button.bind("<Return>", lambda event: continue_button.invoke())
 
     def prev_card(self):
+        """
+        Show the previous flashcard in the deck.
+        """
         if self.current_card_index > 0:
             self.current_card_index -= 1
             self.reviewed_cards = max(0, self.reviewed_cards - 1)
         self.show_flashcard()
 
     def next_card(self):
+        """
+        Show the next flashcard in the deck.
+        """
         self.reviewed_cards += 1
         if self.current_card_index < len(self.cards_to_review) - 1:
             self.current_card_index += 1
@@ -158,6 +186,11 @@ class LearningSession:
         self.show_flashcard()
 
     def end_learning_session(self, completed=False):
+        """
+        End the learning session and show a message to the user, depending on whether the deck was completed or not.
+        If the deck was completed, show a message with the option to return to the main menu. If exit was triggered
+        while the deck was not completed, show a message with the option to quit anyway or continue learning.
+        """
         for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
@@ -211,6 +244,9 @@ class LearningSession:
             continue_button.pack(side=tk.LEFT, padx=10)
 
     def show_empty_deck_message(self, set_index):
+        """
+        Show a message to the user that the deck is empty and provide the option to add cards.
+        """
         for widget in self.app.main_frame.winfo_children():
             widget.destroy()
 
@@ -221,7 +257,8 @@ class LearningSession:
         message_frame = ctk.CTkFrame(self.app.main_frame, fg_color="white", corner_radius=10)
         message_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
-        ctk.CTkLabel(message_frame, text="This deck has no cards. Would you like to add some cards?", font=("Roboto", 14), wraplength=300).pack(pady=20)
+        ctk.CTkLabel(message_frame, text="This deck has no cards. Would you like to add some cards?",
+                     font=("Roboto", 14), wraplength=300).pack(pady=20)
 
         button_frame = ctk.CTkFrame(message_frame, fg_color="transparent")
         button_frame.pack(pady=10)
